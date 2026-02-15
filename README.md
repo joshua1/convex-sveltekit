@@ -8,7 +8,7 @@
 
 ## The problem
 
-Convex gives you a real-time database. SvelteKit gives you the best full-stack DX in the JavaScript ecosystem. Using them together today means choosing: either you get Convex's live queries *or* SvelteKit's SSR and form magic. Not both.
+Convex gives you a real-time database. SvelteKit gives you the best full-stack DX in the JavaScript ecosystem. Using them together today means choosing: either you get Convex's live queries _or_ SvelteKit's SSR and form magic. Not both.
 
 With `convex-svelte`, you get `useQuery` and that's about it. SSR means manually wiring `ConvexHttpClient` in load functions, passing `initialData`, and deriving the final value. Mutations mean calling `client.mutation()` by hand. No form spreading, no validation, no `pending` state.
 
@@ -67,7 +67,7 @@ Drop-in component-level query with auto-updating data via WebSocket.
 
 ```svelte
 <script>
-  import { convexQuery } from 'convex-sveltekit'
+  import { convexQuery } from "convex-sveltekit"
 
   const tasks = convexQuery(api.tasks.get, {})
 </script>
@@ -84,7 +84,7 @@ Drop-in component-level query with auto-updating data via WebSocket.
 Supports conditional queries:
 
 ```ts
-const user = convexQuery(api.users.get, () => userId ? { id: userId } : "skip")
+const user = convexQuery(api.users.get, () => (userId ? { id: userId } : "skip"))
 ```
 
 ### `convexLoad()` — SSR with automatic live upgrade
@@ -93,10 +93,10 @@ Use in SvelteKit load functions. Data is fetched server-side, then seamlessly up
 
 ```ts
 // +page.ts
-import { convexLoad } from 'convex-sveltekit'
+import { convexLoad } from "convex-sveltekit"
 
 export const load = async () => ({
-  tasks: await convexLoad(api.tasks.get, {})
+  tasks: await convexLoad(api.tasks.get, {}),
 })
 ```
 
@@ -119,13 +119,10 @@ Matches the API of SvelteKit's `RemoteForm`. Spread onto `<form>`, get field bin
 
 ```svelte
 <script>
-  import { convexForm } from 'convex-sveltekit'
-  import { z } from 'zod'
+  import { convexForm } from "convex-sveltekit"
+  import { z } from "zod"
 
-  const createTask = convexForm(
-    z.object({ text: z.string().min(1) }),
-    api.tasks.create
-  )
+  const createTask = convexForm(z.object({ text: z.string().min(1) }), api.tasks.create)
 </script>
 
 <form {...createTask}>
@@ -142,6 +139,7 @@ Matches the API of SvelteKit's `RemoteForm`. Spread onto `<form>`, get field bin
 ```
 
 Features:
+
 - **Form spreading** — `{...form}` attaches submit handler via `createAttachmentKey`
 - **Field bindings** — `.fields.name.as("text")` returns typed input attributes
 - **Validation** — Zod (or any Standard Schema) for client-side validation
@@ -178,7 +176,7 @@ npm install convex-sveltekit convex
 
 ```ts
 // src/hooks.client.ts
-import { initConvex } from 'convex-sveltekit'
+import { initConvex } from "convex-sveltekit"
 initConvex(PUBLIC_CONVEX_URL)
 ```
 
@@ -187,7 +185,7 @@ initConvex(PUBLIC_CONVEX_URL)
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script>
-  import { setupConvex } from 'convex-sveltekit'
+  import { setupConvex } from "convex-sveltekit"
   setupConvex(PUBLIC_CONVEX_URL)
 </script>
 ```
@@ -196,13 +194,13 @@ initConvex(PUBLIC_CONVEX_URL)
 
 ```ts
 // src/hooks.ts
-import { encodeConvexLoad, decodeConvexLoad } from 'convex-sveltekit'
+import { encodeConvexLoad, decodeConvexLoad } from "convex-sveltekit"
 
 export const transport = {
   ConvexLoadResult: {
     encode: (value) => encodeConvexLoad(value),
     decode: (encoded) => decodeConvexLoad(encoded),
-  }
+  },
 }
 ```
 
@@ -210,9 +208,9 @@ export const transport = {
 
 ```svelte
 <script>
-  import { convexQuery, convexForm } from 'convex-sveltekit'
-  import { api } from '$convex/_generated/api'
-  import { z } from 'zod'
+  import { convexQuery, convexForm } from "convex-sveltekit"
+  import { api } from "$convex/_generated/api"
+  import { z } from "zod"
 
   const tasks = convexQuery(api.tasks.get, {})
   const addTask = convexForm(z.object({ text: z.string() }), api.tasks.create)
@@ -221,18 +219,18 @@ export const transport = {
 
 ## API
 
-| Function | Purpose |
-|---|---|
-| `initConvex(url)` | Early client init (hooks.client.ts) |
-| `setupConvex(url)` | Layout init (context + cleanup) |
-| `convexQuery(ref, args, opts?)` | Live query in components |
-| `convexLoad(ref, args)` | SSR query in load functions |
-| `convexForm(schema, mutationRef)` | Form with SvelteKit DX |
-| `convexCommand(ref)` | Programmatic mutation/action |
-| `getConvexClient()` | Raw client access (escape hatch) |
-| `useConvexClient()` | Client from Svelte context |
-| `serverQuery(ref, args)` | Server-side one-shot query |
-| `serverMutation(ref, args)` | Server-side one-shot mutation |
+| Function                          | Purpose                             |
+| --------------------------------- | ----------------------------------- |
+| `initConvex(url)`                 | Early client init (hooks.client.ts) |
+| `setupConvex(url)`                | Layout init (context + cleanup)     |
+| `convexQuery(ref, args, opts?)`   | Live query in components            |
+| `convexLoad(ref, args)`           | SSR query in load functions         |
+| `convexForm(schema, mutationRef)` | Form with SvelteKit DX              |
+| `convexCommand(ref)`              | Programmatic mutation/action        |
+| `getConvexClient()`               | Raw client access (escape hatch)    |
+| `useConvexClient()`               | Client from Svelte context          |
+| `serverQuery(ref, args)`          | Server-side one-shot query          |
+| `serverMutation(ref, args)`       | Server-side one-shot mutation       |
 
 ## Roadmap
 

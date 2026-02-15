@@ -29,13 +29,13 @@ const IS_BROWSER = typeof globalThis.document !== "undefined"
  * Idempotent — subsequent calls are no-ops.
  */
 export function initConvex(url: string, options: ConvexClientOptions = {}): ConvexClient {
-	if (_client) return _client
-	if (!url || typeof url !== "string") {
-		throw new Error("[convex-sveltekit] initConvex requires a non-empty URL string")
-	}
-	_url = url
-	_client = new ConvexClient(url, { disabled: !IS_BROWSER, ...options })
-	return _client
+  if (_client) return _client
+  if (!url || typeof url !== "string") {
+    throw new Error("[convex-sveltekit] initConvex requires a non-empty URL string")
+  }
+  _url = url
+  _client = new ConvexClient(url, { disabled: !IS_BROWSER, ...options })
+  return _client
 }
 
 /**
@@ -44,10 +44,10 @@ export function initConvex(url: string, options: ConvexClientOptions = {}): Conv
  * otherwise creates one (SSR path). Sets typesafe context + registers cleanup.
  */
 export function setupConvex(url: string, options: ConvexClientOptions = {}): ConvexClient {
-	const client = initConvex(url, options)
-	setConvexContext(client)
-	$effect(() => () => client.close())
-	return client
+  const client = initConvex(url, options)
+  setConvexContext(client)
+  $effect(() => () => client.close())
+  return client
 }
 
 // ============================================================================
@@ -56,23 +56,23 @@ export function setupConvex(url: string, options: ConvexClientOptions = {}): Con
 
 /** Module-level access — works anywhere (hooks, transport, utilities). */
 export function getConvexClient(): ConvexClient {
-	if (!_client) {
-		throw new Error(
-			"[convex-sveltekit] Client not initialized. Call initConvex() first (e.g. in hooks.client.ts)",
-		)
-	}
-	return _client
+  if (!_client) {
+    throw new Error(
+      "[convex-sveltekit] Client not initialized. Call initConvex() first (e.g. in hooks.client.ts)",
+    )
+  }
+  return _client
 }
 
 /** Get the stored Convex URL (for server-side HTTP client). */
 export function getConvexUrl(): string {
-	if (!_url) {
-		throw new Error("[convex-sveltekit] URL not set. Call initConvex() first.")
-	}
-	return _url
+  if (!_url) {
+    throw new Error("[convex-sveltekit] URL not set. Call initConvex() first.")
+  }
+  return _url
 }
 
 /** Context access — works in components under setupConvex(). Typesafe. */
 export function useConvexClient(): ConvexClient {
-	return getConvexContext()
+  return getConvexContext()
 }
