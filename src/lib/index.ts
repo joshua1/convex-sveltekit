@@ -26,3 +26,6 @@ export {
 
 // Server-side helpers (for .remote.ts and load functions)
 export { serverQuery, serverMutation, serverAction } from "./server.js"
+
+// Auth bridge (Better Auth ↔ Convex)
+export { setupConvexAuth, useConvexAuth } from "./auth.svelte.js"

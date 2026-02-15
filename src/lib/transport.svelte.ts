@@ -1,7 +1,7 @@
 /**
  * SSR bridge — convexLoad() + transport encode/decode.
  *
- * On the server, convexLoad fetches via ConvexHttpClient.
+ * On the server, convexLoad fetches via ConvexHttpClient (auth-aware).
  * On the client, transport.decode upgrades it to a live subscription.
  * On client-side navigation, convexLoad creates a live subscription directly.
  */
@@ -29,15 +29,32 @@ export class ConvexLoadResult<T = unknown> {
 }
 
 // ============================================================================
-// convexLoad — for load functions
+// Server-side auth helper
 // ============================================================================
 
-let _httpClient: ConvexHttpClient | null = null
+/**
+ * Get auth token from the current SvelteKit request context.
+ * Uses dynamic import() — $app/server is a Vite virtual module, require() won't resolve it.
+ */
+async function getTokenFromRequest(): Promise<string | null> {
+  if (IS_BROWSER) return null
+  try {
+    const { getRequestEvent } = await import("$app/server")
+    const event = getRequestEvent()
+    return event?.locals?.convexToken ?? null
+  } catch {
+    return null
+  }
+}
+
+// ============================================================================
+// convexLoad — for load functions
+// ============================================================================
 
 /**
  * Fetch Convex data for use in load functions. Smart about where it runs:
  *
- * - **Server (SSR):** fetches via ConvexHttpClient, returns ConvexLoadResult.
+ * - **Server (SSR):** fetches via ConvexHttpClient (auth-aware), returns ConvexLoadResult.
  *   Transport hook decodes it into a live subscription on the client.
  * - **Client (navigation):** creates a live subscription directly via
  *   createDetachedQuery(). Returns a reactive ConvexQueryResult immediately.
@@ -53,19 +70,23 @@ export async function convexLoad<Query extends FunctionReference<"query">>(
   ref: Query,
   args: FunctionArgs<Query>,
 ): Promise<ConvexQueryResult<Query>> {
-  if (!_httpClient) {
-    _httpClient = new ConvexHttpClient(getConvexUrl())
+  const httpClient = new ConvexHttpClient(getConvexUrl())
+
+  if (!IS_BROWSER) {
+    // Server-side: set auth token if available
+    const token = await getTokenFromRequest()
+    if (token) httpClient.setAuth(token)
   }
 
   if (IS_BROWSER) {
     // Client-side navigation: fetch initial data, then create live subscription
-    const initialData = await _httpClient.query(ref, args)
+    const initialData = await httpClient.query(ref, args)
     return createDetachedQuery(ref, args, initialData) as ConvexQueryResult<Query>
   }
 
   // Server-side: HTTP fetch, wrap in ConvexLoadResult for transport.
   // transport.decode replaces this with a ConvexQueryResult on the client.
-  const data = await _httpClient.query(ref, args)
+  const data = await httpClient.query(ref, args)
   const name = getFunctionName(ref)
   return new ConvexLoadResult(
     name,
