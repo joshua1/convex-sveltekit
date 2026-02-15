@@ -2,7 +2,7 @@
 
 > SvelteKit-native Convex integration. Real-time queries, form spreading, SSR-to-live transport.
 
-**Status:** Experimental. Not production-ready. Expect breaking changes.
+**Status:** Experimental — actively being tested. Expect breaking changes.
 
 ---
 
@@ -158,7 +158,7 @@ const removeTask = convexCommand(api.tasks.remove)
 await removeTask({ id: task._id })
 ```
 
-## How the transport magic works
+## How the transport works
 
 1. `convexLoad()` in your load function fetches data server-side via `ConvexHttpClient`
 2. SvelteKit's `transport` hook serializes the result across the SSR boundary
@@ -244,11 +244,9 @@ export const transport = {
 
 ## Credits
 
-Built by [Axel Rock](https://github.com/axel-rock) and [Claude Opus 4.6](https://claude.ai).
+Built by [Axel Rock](https://github.com/axel-rock).
 
 Inspired by [convex-svelte](https://github.com/get-convex/convex-svelte) by the Convex team.
-
-This idea has been brewing for months — born from the nightly frustration of wanting Convex's real-time power with SvelteKit's developer experience. Built in one session, and now battle-tested at [Cobl](https://cobl.ai), an AI-powered business document generator.
 
 ## License
 

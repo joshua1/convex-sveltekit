@@ -1,1 +1,82 @@
-@import "tailwindcss";
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+:root {
+	color-scheme: light dark;
+	--accent: #ff6b35;
+	--accent-dim: #e55a28;
+	--bg: light-dark(#faf9f7, #1a1a1a);
+	--bg-soft: light-dark(#f2f1ef, #232323);
+	--bg-muted: light-dark(#eae9e6, #2a2a2a);
+	--text: light-dark(#333, #e0e0e0);
+	--text-soft: light-dark(#666, #aaa);
+	--text-muted: light-dark(#999, #777);
+	--border: light-dark(#e0dfdc, #333);
+	--border-soft: light-dark(#ece9e6, #2a2a2a);
+	--code-bg: light-dark(#2a2a2a, #1a1a1a);
+	--success: light-dark(#2a7d4f, #4caf80);
+	--danger: light-dark(#c44, #e66);
+
+	font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	background: var(--bg);
+	color: var(--text);
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	min-height: 100dvh;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+code {
+	font-family: ui-monospace, "SF Mono", Menlo, monospace;
+	font-size: 0.875em;
+	background: var(--bg-muted);
+	padding: 0.15em 0.4em;
+	border-radius: 3px;
+}
+
+pre {
+	overflow-x: auto;
+	background: var(--code-bg);
+	color: #e0e0e0;
+	padding: 1rem;
+	border-radius: 4px;
+	font-size: 0.875rem;
+	line-height: 1.6;
+}
+
+pre code {
+	background: none;
+	padding: 0;
+	border-radius: 0;
+}
+
+button {
+	cursor: pointer;
+	text-box-trim: both;
+	text-box-edge: cap alphabetic;
+}
+
+input {
+	font: inherit;
+	color: inherit;
+}

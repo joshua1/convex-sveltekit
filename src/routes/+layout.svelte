@@ -11,7 +11,7 @@
 
 <svelte:head>
 	<title>convex-sveltekit</title>
-	<meta name="description" content="SvelteKit-native Convex integration" />
+	<meta name="description" content="SvelteKit-native Convex integration with real-time queries, form spreading, and SSR-to-live transport." />
 </svelte:head>
 
 {@render children()}

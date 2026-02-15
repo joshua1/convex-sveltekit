@@ -1,5 +1,5 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 
 export const get = query({
 	args: {},
@@ -28,5 +28,25 @@ export const toggleComplete = mutation({
 		const task = await ctx.db.get(id)
 		if (!task) throw new Error("Task not found")
 		await ctx.db.patch(id, { isCompleted: !task.isCompleted })
+	},
+})
+
+const defaultTasks = [
+	{ text: "Install SvelteKit", isCompleted: true },
+	{ text: "Go for a walk", isCompleted: true },
+	{ text: "Sign up for Convex", isCompleted: false },
+	{ text: "Star this repo", isCompleted: false },
+]
+
+export const cleanAndSeed = internalMutation({
+	args: {},
+	handler: async (ctx) => {
+		const tasks = await ctx.db.query("tasks").collect()
+		for (const task of tasks) {
+			await ctx.db.delete(task._id)
+		}
+		for (const task of defaultTasks) {
+			await ctx.db.insert("tasks", task)
+		}
 	},
 })
