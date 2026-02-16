@@ -99,12 +99,18 @@ export async function convexLoad<Query extends FunctionReference<"query">>(
 // Transport encode/decode — for hooks.ts
 // ============================================================================
 
-/** Encode a ConvexLoadResult for serialization across the SSR boundary */
+/** Encode a ConvexLoadResult for serialization across the SSR boundary.
+ *  Uses duck-type check (`__convexLoad`) instead of `instanceof` because
+ *  Vite HMR can create separate class identities for the same module. */
 export function encodeConvexLoad(
   value: unknown,
 ): false | { refName: string; args: Record<string, unknown>; data: unknown } {
-  if (value instanceof ConvexLoadResult) {
-    return { refName: value.refName, args: value.args, data: value.data }
+  if (
+    value instanceof ConvexLoadResult ||
+    (value != null && typeof value === "object" && "__convexLoad" in value)
+  ) {
+    const v = value as ConvexLoadResult
+    return { refName: v.refName, args: v.args, data: v.data }
   }
   return false
 }

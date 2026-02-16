@@ -29,10 +29,12 @@ export interface ConvexCommand<
 /**
  * Create a callable command wrapping a Convex mutation or action.
  * Matches SvelteKit's RemoteCommand<Input, Output> pattern.
+ *
+ * Pass `"action"` as second arg for Convex actions (Node runtime).
  */
 export function convexCommand<
   Ref extends FunctionReference<"mutation"> | FunctionReference<"action">,
->(ref: Ref): ConvexCommand<Ref> {
+>(ref: Ref, type?: "mutation" | "action"): ConvexCommand<Ref> {
   type Output = FunctionReturnType<Ref>
 
   let pendingCount = $state(0)
@@ -43,6 +45,9 @@ export function convexCommand<
     const promise = (async () => {
       try {
         const client = getConvexClient()
+        if (type === "action") {
+          return (await client.action(ref as FunctionReference<"action">, args)) as Output
+        }
         return (await client.mutation(ref as FunctionReference<"mutation">, args)) as Output
       } finally {
         pendingCount--
