@@ -29,3 +29,12 @@ export { serverQuery, serverMutation, serverAction } from "./server.js"
 
 // Auth bridge (Better Auth ↔ Convex)
 export { setupConvexAuth, useConvexAuth } from "./auth.svelte.js"
+
+// User transport (JWT seed → live Convex subscription)
+export {
+  convexUser,
+  ConvexUserResult,
+  encodeConvexUser,
+  decodeConvexUser,
+  type ConvexUserData,
+} from "./user.svelte.js"
