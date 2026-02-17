@@ -26,15 +26,32 @@ const IS_BROWSER = typeof globalThis.document !== "undefined"
 /**
  * Initialize the Convex client at module level (before any component mounts).
  * Call from `hooks.client.ts` to ensure the client exists before transport.decode.
+ *
+ * When `initialToken` is provided, the client authenticates the WebSocket
+ * immediately — before any subscription fires. This prevents unauthenticated
+ * query results from overwriting SSR data.
+ *
  * Idempotent — subsequent calls are no-ops.
  */
-export function initConvex(url: string, options: ConvexClientOptions = {}): ConvexClient {
+export function initConvex(
+  url: string,
+  options: ConvexClientOptions = {},
+  initialToken?: string,
+): ConvexClient {
   if (_client) return _client
   if (!url || typeof url !== "string") {
     throw new Error("[convex-sveltekit] initConvex requires a non-empty URL string")
   }
   _url = url
   _client = new ConvexClient(url, { disabled: !IS_BROWSER, ...options })
+
+  // Pre-authenticate before transport.decode creates subscriptions
+  if (initialToken && IS_BROWSER) {
+    _client.setAuth(
+      async ({ forceRefreshToken }) => (forceRefreshToken ? null : initialToken),
+    )
+  }
+
   return _client
 }
 

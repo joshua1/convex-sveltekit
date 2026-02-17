@@ -147,13 +147,56 @@ Features:
 - **`.enhance()`** — custom submit lifecycle
 - **`.pending`** — in-flight mutation count
 
-### `convexCommand()` — programmatic mutations
+### `convexCommand()` — programmatic mutations/actions
 
-For mutations that don't need a form.
+For mutations (or actions) that don't need a form. Pass `"action"` as second arg for Convex actions.
 
 ```ts
 const removeTask = convexCommand(api.tasks.remove)
 await removeTask({ id: task._id })
+
+const generate = convexCommand(api.ai.generate, "action")
+await generate({ prompt: "..." })
+```
+
+### `setupConvexAuth()` — Better Auth integration
+
+Wires [Better Auth](https://www.better-auth.com/) sessions into the Convex client. Pass `initialToken` from SSR to pre-authenticate the WebSocket before any subscription fires — prevents unauthenticated query flashes.
+
+```svelte
+<!-- +layout.svelte -->
+<script>
+  import { setupConvex, setupConvexAuth } from "convex-sveltekit"
+
+  let { data } = $props()
+  setupConvex(PUBLIC_CONVEX_URL)
+  setupConvexAuth({ authClient, initialToken: data.convexToken })
+</script>
+```
+
+Read auth state anywhere with `useConvexAuth()`:
+
+```ts
+const auth = useConvexAuth()
+// auth.isAuthenticated, auth.isLoading
+```
+
+### `convexUser()` — SSR-to-live user data
+
+Seeds user data from JWT claims on the server, then upgrades to a live Convex subscription on the client. Preloads profile images before swapping state to prevent flicker.
+
+```ts
+// +layout.server.ts
+import { convexUser } from "convex-sveltekit"
+
+export const load = async ({ locals }) => ({
+  user: convexUser(locals.user),
+})
+```
+
+```svelte
+<!-- +layout.svelte — data.user is reactive, auto-upgrades to Convex data -->
+<AppSidebar user={data.user} />
 ```
 
 ## How the transport works
@@ -177,7 +220,10 @@ npm install convex-sveltekit convex
 ```ts
 // src/hooks.client.ts
 import { initConvex } from "convex-sveltekit"
+import { PUBLIC_CONVEX_URL } from "$env/static/public"
+
 initConvex(PUBLIC_CONVEX_URL)
+// With auth: initConvex(PUBLIC_CONVEX_URL, {}, initialToken)
 ```
 
 ### 2. Set up context in root layout
@@ -219,22 +265,26 @@ export const transport = {
 
 ## API
 
-| Function                          | Purpose                             |
-| --------------------------------- | ----------------------------------- |
-| `initConvex(url)`                 | Early client init (hooks.client.ts) |
-| `setupConvex(url)`                | Layout init (context + cleanup)     |
-| `convexQuery(ref, args, opts?)`   | Live query in components            |
-| `convexLoad(ref, args)`           | SSR query in load functions         |
-| `convexForm(schema, mutationRef)` | Form with SvelteKit DX              |
-| `convexCommand(ref)`              | Programmatic mutation/action        |
-| `getConvexClient()`               | Raw client access (escape hatch)    |
-| `useConvexClient()`               | Client from Svelte context          |
-| `serverQuery(ref, args)`          | Server-side one-shot query          |
-| `serverMutation(ref, args)`       | Server-side one-shot mutation       |
+| Function                              | Purpose                                 |
+| ------------------------------------- | --------------------------------------- |
+| `initConvex(url, opts?, token?)`      | Early client init (hooks.client.ts)     |
+| `setupConvex(url)`                    | Layout init (context + cleanup)         |
+| `convexQuery(ref, args, opts?)`       | Live query in components                |
+| `convexLoad(ref, args)`              | SSR query in load functions             |
+| `convexForm(schema, mutationRef)`     | Form with SvelteKit DX                  |
+| `convexCommand(ref, type?)`           | Programmatic mutation/action            |
+| `setupConvexAuth({ authClient, ... })`| Better Auth ↔ Convex bridge             |
+| `useConvexAuth()`                     | Read auth state (isAuthenticated, etc.) |
+| `convexUser(data)`                    | SSR-to-live user data transport         |
+| `getConvexClient()`                   | Raw client access (escape hatch)        |
+| `useConvexClient()`                   | Client from Svelte context              |
+| `serverQuery(ref, args)`             | Server-side one-shot query              |
+| `serverMutation(ref, args)`          | Server-side one-shot mutation           |
+| `serverAction(ref, args)`            | Server-side one-shot action             |
 
 ## Roadmap
 
-- [ ] Auth token forwarding (Better Auth, Convex Auth)
+- [x] Auth token forwarding (Better Auth)
 - [ ] Paginated query support (`usePaginatedQuery` equivalent)
 - [ ] Test suite
 - [ ] Optimized cleanup for detached queries

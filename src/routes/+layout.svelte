@@ -143,7 +143,7 @@
   <section id="features">
     <h2>Features</h2>
     <div class="grid">
-      {#each [["convexQuery()", "Live queries that auto-update via WebSocket. Drop-in replacement for useQuery."], ["convexForm()", "SvelteKit's form DX for Convex mutations. Spread, validate, enhance — no server hop."], ["convexLoad()", "SSR in load functions. Transport hook auto-upgrades to live on the client."], ["convexCommand()", "Programmatic mutations matching SvelteKit's RemoteCommand pattern."]] as [title, desc], i (i)}
+      {#each [["convexQuery()", "Live queries that auto-update via WebSocket. Drop-in replacement for useQuery."], ["convexForm()", "SvelteKit's form DX for Convex mutations. Spread, validate, enhance — no server hop."], ["convexLoad()", "SSR in load functions. Transport hook auto-upgrades to live on the client."], ["convexCommand()", "Programmatic mutations and actions matching SvelteKit's RemoteCommand pattern."], ["setupConvexAuth()", "Better Auth integration with SSR token seeding. No unauthenticated flashes."], ["convexUser()", "SSR-to-live user data. Seeds from JWT, upgrades to Convex subscription."]] as [title, desc], i (i)}
         <div>
           <h3>{title}</h3>
           <p>{desc}</p>
