@@ -37,7 +37,6 @@ interface StandardSchema<Input = unknown> {
 }
 import { tick } from "svelte"
 import { getConvexClient } from "./client.svelte.js"
-import { SvelteMap } from "svelte/reactivity"
 
 // ============================================================================
 // Types
@@ -339,7 +338,8 @@ export function convexForm<
 ): ConvexForm<Input, FunctionReturnType<Mutation>> {
   type Output = FunctionReturnType<Mutation>
 
-  const instances = new SvelteMap<
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- internal singleton tracking, not reactive state
+  const instances = new Map<
     string | number | undefined,
     { count: number; instance: ConvexForm<Input, Output> }
   >()
