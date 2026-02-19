@@ -213,6 +213,12 @@ This means: SSR for first paint, preloading on hover, instant navigation, then r
 
 ```bash
 npm install convex-sveltekit convex
+# or
+pnpm add convex-sveltekit convex
+# or
+yarn add convex-sveltekit convex
+# or
+bun add convex-sveltekit convex
 ```
 
 ### 1. Initialize in hooks (early, for transport)
@@ -224,6 +230,16 @@ import { PUBLIC_CONVEX_URL } from "$env/static/public"
 
 initConvex(PUBLIC_CONVEX_URL)
 // With auth: initConvex(PUBLIC_CONVEX_URL, {}, initialToken)
+```
+
+If you use `convexLoad()` or `serverQuery()` in load functions, also add a server hook:
+
+```ts
+// src/hooks.server.ts
+import { initConvex } from "convex-sveltekit"
+import { PUBLIC_CONVEX_URL } from "$env/static/public"
+
+initConvex(PUBLIC_CONVEX_URL)
 ```
 
 ### 2. Set up context in root layout

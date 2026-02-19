@@ -7,6 +7,23 @@
   setupConvex(PUBLIC_CONVEX_URL)
 
   let { children }: { children: Snippet } = $props()
+
+  const pms = [
+    { id: "npm", cmd: "npm install convex-sveltekit convex" },
+    { id: "pnpm", cmd: "pnpm add convex-sveltekit convex" },
+    { id: "yarn", cmd: "yarn add convex-sveltekit convex" },
+    { id: "bun", cmd: "bun add convex-sveltekit convex" },
+  ] as const
+
+  let activePm = $state<string>("npm")
+  let copied = $state(false)
+
+  function copyCmd() {
+    const cmd = pms.find((p) => p.id === activePm)!.cmd
+    navigator.clipboard.writeText(cmd)
+    copied = true
+    setTimeout(() => (copied = false), 1500)
+  }
 </script>
 
 <svelte:head>
@@ -31,6 +48,27 @@
       <a href="https://github.com/axel-rock/convex-sveltekit" class="btn-outline">GitHub</a>
     </nav>
   </header>
+
+  <!-- Install -->
+  <section id="install">
+    <div class="install-tabs">
+      {#each pms as pm (pm.id)}
+        <button
+          class="install-tab"
+          class:active={activePm === pm.id}
+          onclick={() => (activePm = pm.id)}
+        >
+          {pm.id}
+        </button>
+      {/each}
+    </div>
+    <div class="install-cmd">
+      <code>{pms.find((p) => p.id === activePm)!.cmd}</code>
+      <button class="install-copy" onclick={copyCmd} aria-label="Copy to clipboard">
+        {copied ? "Copied!" : "Copy"}
+      </button>
+    </div>
+  </section>
 
   <!-- Before / After -->
   <section id="comparison">
@@ -268,6 +306,66 @@
   .btn-outline:hover {
     background: var(--bg-soft);
     text-decoration: none;
+  }
+
+  /* Install */
+  #install {
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: 0 0 2rem;
+  }
+  .install-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .install-tab {
+    padding: 0.4rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .install-tab:hover {
+    color: var(--text);
+  }
+  .install-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .install-cmd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 0.75rem 1rem;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.875rem;
+  }
+  .install-cmd code {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .install-copy {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+  .install-copy:hover {
+    background: var(--bg-muted);
+    color: var(--text);
   }
 
   /* Sections */
