@@ -10,8 +10,8 @@
 </script>
 
 <div class="notice notice-amber">
-  <strong>Client-side:</strong> Data fetched via WebSocket after component mounts. You'll see a brief
-  loading state on navigation.
+  <strong>Client-side:</strong> Data fetched via WebSocket after component mounts. Brief loading state,
+  then live. <em>Data resets every 5 min.</em>
 </div>
 
 <form {...createTask} class="demo-form">

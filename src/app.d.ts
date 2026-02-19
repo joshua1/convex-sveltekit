@@ -1,9 +1,14 @@
 declare global {
   namespace App {
-    // interface Error {}
-    // interface Locals {}
-    // interface PageData {}
-    // interface Platform {}
+    interface Locals {
+      convexToken?: string
+      user?: {
+        id: string
+        email: string
+        name: string
+        image?: string | null
+      }
+    }
   }
 }
 

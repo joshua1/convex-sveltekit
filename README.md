@@ -159,9 +159,15 @@ const generate = convexCommand(api.ai.generate, "action")
 await generate({ prompt: "..." })
 ```
 
-### `setupConvexAuth()` — Better Auth integration
+### `setupConvexAuth()` + `convexUser()` — Better Auth integration
 
-Wires [Better Auth](https://www.better-auth.com/) sessions into the Convex client. Pass `initialToken` from SSR to pre-authenticate the WebSocket before any subscription fires — prevents unauthenticated query flashes.
+Full [Better Auth](https://www.better-auth.com/) integration with SSR token seeding, cookie-based auth, and live user data.
+
+**See [BETTER_AUTH.md](./BETTER_AUTH.md) for the complete setup guide** — covers the Convex component, auth proxy, server hooks, client wiring, and working examples.
+
+> **Alternative:** [`convex-better-auth-svelte`](https://github.com/mmailaender/convex-better-auth-svelte) by [@mmailaender](https://github.com/mmailaender) is an excellent batteries-included adapter with [ready-made UI components](https://github.com/mmailaender/Convex-Better-Auth-UI). If you want to get up and running fast, check that out first. The `convex-sveltekit` auth integration is for when you want the same auth to fit `convexLoad` / `convexForm` / transport patterns.
+
+Quick taste:
 
 ```svelte
 <!-- +layout.svelte -->
@@ -174,30 +180,15 @@ Wires [Better Auth](https://www.better-auth.com/) sessions into the Convex clien
 </script>
 ```
 
-Read auth state anywhere with `useConvexAuth()`:
-
 ```ts
-const auth = useConvexAuth()
-// auth.isAuthenticated, auth.isLoading
-```
-
-### `convexUser()` — SSR-to-live user data
-
-Seeds user data from JWT claims on the server, then upgrades to a live Convex subscription on the client. Preloads profile images before swapping state to prevent flicker.
-
-```ts
-// +layout.server.ts
-import { convexUser } from "convex-sveltekit"
-
+// +layout.server.ts — seeds user from JWT, auto-upgrades to live Convex data
 export const load = async ({ locals }) => ({
   user: convexUser(locals.user),
+  convexToken: locals.convexToken ?? null,
 })
 ```
 
-```svelte
-<!-- +layout.svelte — data.user is reactive, auto-upgrades to Convex data -->
-<AppSidebar user={data.user} />
-```
+> **SSR note:** Using `.server.ts` load files (instead of `.ts`) for authenticated data currently eliminates rendering flicker completely. Universal `.ts` files work but may flash briefly while the client-side token syncs.
 
 ## How the transport works
 
@@ -300,7 +291,8 @@ export const transport = {
 
 ## Roadmap
 
-- [x] Auth token forwarding (Better Auth)
+- [x] Auth token forwarding (Better Auth) — [setup guide](./BETTER_AUTH.md)
+- [x] Working auth demo (email/password, login, profile, SSR user data)
 - [ ] Paginated query support (`usePaginatedQuery` equivalent)
 - [ ] Test suite
 - [ ] Optimized cleanup for detached queries

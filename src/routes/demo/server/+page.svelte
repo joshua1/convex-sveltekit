@@ -12,8 +12,8 @@
 </script>
 
 <div class="notice notice-green">
-  <strong>Server-side:</strong> Data fetched in load function via ConvexHttpClient. Hover the tab — SvelteKit
-  preloads it. No loading spinner. Then auto-upgrades to live.
+  <strong>Server-side:</strong> Data fetched in load function via ConvexHttpClient. No loading spinner.
+  Auto-upgrades to live. <em>Data resets every 5 min.</em>
 </div>
 
 <form {...createTask} class="demo-form">
