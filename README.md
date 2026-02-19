@@ -1,5 +1,7 @@
 # convex-sveltekit
 
+[![npm](https://img.shields.io/npm/v/convex-sveltekit)](https://www.npmjs.com/package/convex-sveltekit)
+
 > SvelteKit-native Convex integration. Real-time queries, form spreading, SSR-to-live transport.
 
 **Status:** Experimental — actively being tested. Expect breaking changes.
