@@ -1,6 +1,6 @@
 {
   "name": "convex-sveltekit",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "packageManager": "pnpm@10.24.0",
   "description": "SvelteKit-native Convex integration. Real-time queries, form spreading, SSR-to-live transport.",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "package": "svelte-kit sync && svelte-package",
+    "package": "svelte-kit sync && svelte-package && node scripts/check-dist.js",
     "prepublishOnly": "npm run package",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "prepare": "husky",

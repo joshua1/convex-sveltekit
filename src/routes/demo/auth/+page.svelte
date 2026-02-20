@@ -1,6 +1,6 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation"
-  import { authClient } from "$lib/auth-client.js"
+  import { authClient } from "$demo/auth-client.js"
   import { useConvexAuth } from "$lib/index.js"
 
   let { data } = $props()

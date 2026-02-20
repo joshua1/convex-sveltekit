@@ -1,6 +1,6 @@
 <script lang="ts">
   import { setupConvexAuth } from "$lib/index.js"
-  import { authClient } from "$lib/auth-client.js"
+  import { authClient } from "$demo/auth-client.js"
   import type { Snippet } from "svelte"
 
   let { data, children }: { data: { convexToken: string | null }; children: Snippet } = $props()
