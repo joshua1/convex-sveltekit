@@ -12,6 +12,7 @@
   const links = [
     { href: "/demo/server", label: "Server demo" },
     { href: "/demo/client", label: "Client demo" },
+    { href: "/demo/query", label: "Query demo" },
     { href: "/demo/auth", label: "Auth demo" },
   ]
 </script>
