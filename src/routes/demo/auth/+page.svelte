@@ -2,6 +2,7 @@
   import { invalidateAll } from "$app/navigation"
   import { authClient } from "$demo/auth-client.js"
   import { useConvexAuth } from "$lib/index.js"
+  import { clearAuthCookies } from "./sign-out.remote.js"
 
   let { data } = $props()
   const auth = useConvexAuth()
@@ -14,9 +15,7 @@
   let loading = $state(false)
   let signingOut = $state(false)
 
-  const source = $derived(
-    !data.user ? null : auth.isAuthenticated ? "live" : "jwt",
-  )
+  const source = $derived(!data.user ? null : auth.isAuthenticated ? "live" : "jwt")
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault()
@@ -27,7 +26,8 @@
       if (mode === "signup") {
         const { error: err } = await authClient.signUp.email({ name, email, password })
         if (err) {
-          error = err.status === 422 ? "Account already exists." : (err.message ?? "Sign up failed.")
+          error =
+            err.status === 422 ? "Account already exists." : (err.message ?? "Sign up failed.")
           if (err.status === 422) mode = "signin"
           return
         }
@@ -49,7 +49,7 @@
   async function signOut() {
     signingOut = true
     await authClient.signOut()
-    await fetch("/api/sign-out", { method: "POST" })
+    await clearAuthCookies()
     window.location.reload()
   }
 </script>
@@ -83,20 +83,36 @@
       <li>Server read the JWT cookie — zero network calls — and seeded <code>data.user</code></li>
       <li><code>convexUser()</code> wrapped it for the transport hook</li>
       <li>Client decoded it and subscribed to <code>api.auth.getCurrentUser</code></li>
-      <li>Source shows <strong>jwt seed</strong> until the Convex subscription confirms, then <strong>live subscription</strong></li>
+      <li>
+        Source shows <strong>jwt seed</strong> until the Convex subscription confirms, then
+        <strong>live subscription</strong>
+      </li>
       <li>No loading spinner — the page renders instantly from the cookie</li>
     </ul>
   </div>
-
 {:else}
   <div class="auth-form">
     <h2>{mode === "signin" ? "Sign in" : "Create account"}</h2>
 
     <form onsubmit={handleSubmit}>
       {#if mode === "signup"}
-        <input type="text" bind:value={name} placeholder="Name" required autocomplete="name" disabled={loading} />
+        <input
+          type="text"
+          bind:value={name}
+          placeholder="Name"
+          required
+          autocomplete="name"
+          disabled={loading}
+        />
       {/if}
-      <input type="email" bind:value={email} placeholder="Email" required autocomplete="email" disabled={loading} />
+      <input
+        type="email"
+        bind:value={email}
+        placeholder="Email"
+        required
+        autocomplete="email"
+        disabled={loading}
+      />
       <input
         type="password"
         bind:value={password}
@@ -118,7 +134,14 @@
 
     <p class="toggle">
       {mode === "signin" ? "No account?" : "Already have one?"}
-      <button type="button" onclick={() => { mode = mode === "signin" ? "signup" : "signin"; error = "" }} class="link-btn">
+      <button
+        type="button"
+        onclick={() => {
+          mode = mode === "signin" ? "signup" : "signin"
+          error = ""
+        }}
+        class="link-btn"
+      >
         {mode === "signin" ? "Sign up" : "Sign in"}
       </button>
     </p>
@@ -129,10 +152,19 @@
     <ul>
       <li>Better Auth runs inside Convex as an HTTP action</li>
       <li><code>/api/auth/*</code> proxy keeps cookies on the SvelteKit domain</li>
-      <li><code>handleAuth</code> reads the JWT cookie into <code>locals.convexToken</code> + <code>locals.user</code></li>
+      <li>
+        <code>handleAuth</code> reads the JWT cookie into <code>locals.convexToken</code> +
+        <code>locals.user</code>
+      </li>
       <li><code>setupConvexAuth(initialToken)</code> pre-authenticates the WebSocket — no flash</li>
-      <li><code>convexUser(locals.user)</code> seeds from JWT, auto-upgrades to live Convex subscription</li>
-      <li>Full guide: <a href="https://github.com/axel-rock/convex-sveltekit/blob/main/BETTER_AUTH.md">BETTER_AUTH.md</a></li>
+      <li>
+        <code>convexUser(locals.user)</code> seeds from JWT, auto-upgrades to live Convex subscription
+      </li>
+      <li>
+        Full guide: <a href="https://github.com/axel-rock/convex-sveltekit/blob/main/BETTER_AUTH.md"
+          >BETTER_AUTH.md</a
+        >
+      </li>
     </ul>
   </div>
 {/if}
@@ -201,8 +233,13 @@
     font-weight: 500;
     font-size: 0.85rem;
   }
-  .btn-danger:hover:not(:disabled) { opacity: 0.9; }
-  .btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-danger:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+  .btn-danger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
   /* Auth form */
   .auth-form {
@@ -239,8 +276,13 @@
     font-weight: 600;
     font-size: 0.9rem;
   }
-  .btn-submit:hover:not(:disabled) { background: var(--accent-dim); }
-  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-submit:hover:not(:disabled) {
+    background: var(--accent-dim);
+  }
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
   .error {
     color: var(--danger);
     font-size: 0.85rem;
@@ -260,7 +302,9 @@
     padding: 0;
     cursor: pointer;
   }
-  .link-btn:hover { text-decoration: underline; }
+  .link-btn:hover {
+    text-decoration: underline;
+  }
 
   /* How it works */
   .how {
